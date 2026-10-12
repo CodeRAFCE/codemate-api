@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const { connectDB } = require("./config/database");
+const apiRouter = require("./routes/index");
 
 const app = express();
 const PORT = 3000;
@@ -14,13 +15,8 @@ app.use(express.json());
 // Middleware to read the cookie similar to express.json()
 app.use(cookieParser());
 
-const authRouter = require("./routes/auth");
-const profileRouter = require("./routes/profile");
-const requestRouter = require("./routes/request");
-
-app.use("/api", authRouter);
-app.use("/api", profileRouter);
-app.use("/api", requestRouter);
+// APIs list
+app.use("/api", apiRouter);
 
 // * Always connect to DB and then listen to the server
 connectDB()

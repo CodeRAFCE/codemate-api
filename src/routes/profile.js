@@ -6,7 +6,7 @@ const { validateProfileEditData } = require("../utils/validation");
 
 const profileRouter = express.Router();
 
-profileRouter.get("/profile/view", userAuth, async (req, res) => {
+profileRouter.get("/view", userAuth, async (req, res) => {
   try {
     const {
       _id,
@@ -38,7 +38,7 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
   }
 });
 
-profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
+profileRouter.patch("/edit", userAuth, async (req, res) => {
   try {
     console.log(req.body);
     if (!validateProfileEditData(req)) {
@@ -48,13 +48,14 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
 
     Object.keys(req.body).forEach((key) => (loggedInUser[key] = req.body[key]));
     await loggedInUser.save(); // SAVE to DB
+    
     res.send("User updated successfully");
   } catch (error) {
     throw new Error("ERROR: " + error);
   }
 });
 
-profileRouter.patch("/profile/password", userAuth, async (req, res) => {
+profileRouter.patch("/password", userAuth, async (req, res) => {
   try {
     const { newPassword } = req.body;
     if (!validator.isStrongPassword) {

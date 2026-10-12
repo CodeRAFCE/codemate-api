@@ -5,7 +5,13 @@ const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema(
   {
-    firstName: { type: String, required: true, minLength: 4, maxLength: 50 },
+    firstName: {
+      type: String,
+      required: true,
+      index: true,
+      minLength: 4,
+      maxLength: 50,
+    },
     lastName: { type: String, minLength: 1, maxLength: 50 },
     emailId: {
       type: String,
@@ -27,7 +33,13 @@ const userSchema = new mongoose.Schema(
       },
     },
     age: { type: Number, min: 18 },
-    gender: { type: String, enum: ["male", "female"] },
+    gender: {
+      type: String,
+      enum: {
+        values: ["male", "female", "others"],
+        message: `{VALUE} is incorrect gender`,
+      },
+    },
     photoUrl: {
       type: String,
       default:
@@ -49,6 +61,11 @@ const userSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+// Compond index in mongoDB
+// Find queries runs fast when using index
+//
+userSchema.index({ firstName: 1, lastName: 1 });
+
 userSchema.methods.getJWT = async function () {
   const user = this;
 
@@ -61,8 +78,6 @@ userSchema.methods.getJWT = async function () {
 
 userSchema.methods.validatePassword = async function (passwordByUser) {
   const user = this;
-
-  console.log(user.password);
 
   const isPasswordValid = await bcrypt.compare(passwordByUser, user.password);
 
