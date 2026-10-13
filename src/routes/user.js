@@ -67,6 +67,28 @@ userRouter.get("/feed", userAuth, async (req, res) => {
   try {
     // * Get All users who didn't or hasn't sent connection request
     const loggedInUser = req.user;
+    // OPTIONAL CHECK
+    // if (
+    //   typeof parseInt(req.query.page) !== "number" &&
+    //   typeof parseInt(req.query.limit) !== "number"
+    // ) {
+    //   return res.status(400).json({ message: "Invalid page and limit values" });
+    // }
+
+    const page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.limit) || 10;
+    // This doesn't block the user from fetching the users but also always restricts to 30 users no matter what
+    limit = limit > 30 ? 30 : limit;
+
+    // Bad way because the user is blocked from seeing the users completely
+    // Instead always restrict the limit to 30 instead of showing error
+    // Bad UX for the application when using if statemate for avoiding users to fetch 100000
+    // if (limit > 30) {
+    //   return res.status(400).json({ message: "Pagination limit exceeded" });
+    // }
+
+    const skipRecords = (page - 1) * limit;
+
     const connectionRequest = await ConnectionRequest.find({
       $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
     }).select("fromUserId, toUserId");
@@ -80,12 +102,17 @@ userRouter.get("/feed", userAuth, async (req, res) => {
     // * you can also add self like this or use the mongoDB comparision query "$ne"
     // * hideConnectionRequests.add(loggedInUser._id);
 
+    // * skip() & limit() for pagination to restrict data sent to the client
+    // * Sanitize the data to make sure  we don't set the limit to 100000
     const users = await User.find({
       $and: [
         { _id: { $nin: Array.from(hideConnectionRequests) } },
         { _id: { $ne: loggedInUser._id } },
       ],
-    }).select(USER_SAFE_DATA);
+    })
+      .select(USER_SAFE_DATA)
+      .skip(skipRecords)
+      .limit(limit);
 
     res.json({ message: "Data fetched", users });
   } catch (error) {
