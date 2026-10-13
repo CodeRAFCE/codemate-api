@@ -1,6 +1,7 @@
 const express = require("express");
 const { userAuth } = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequest");
+const User = require("../models/user");
 
 const userRouter = express.Router();
 
@@ -66,6 +67,27 @@ userRouter.get("/feed", userAuth, async (req, res) => {
   try {
     // * Get All users who didn't or hasn't sent connection request
     const loggedInUser = req.user;
+    const connectionRequest = await ConnectionRequest.find({
+      $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+    }).select("fromUserId, toUserId");
+
+    const hideConnectionRequests = new Set();
+    connectionRequest.forEach((req) => {
+      hideConnectionRequests.add(req.fromUserId);
+      hideConnectionRequests.add(req.toUserId);
+    });
+
+    // * you can also add self like this or use the mongoDB comparision query "$ne"
+    // * hideConnectionRequests.add(loggedInUser._id);
+
+    const users = await User.find({
+      $and: [
+        { _id: { $nin: Array.from(hideConnectionRequests) } },
+        { _id: { $ne: loggedInUser._id } },
+      ],
+    }).select(USER_SAFE_DATA);
+
+    res.json({ message: "Data fetched", users });
   } catch (error) {
     throw new Error("ERROR:" + error.message);
   }
