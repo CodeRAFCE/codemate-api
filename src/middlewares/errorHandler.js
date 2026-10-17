@@ -1,5 +1,7 @@
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, req, res, _next) => {
   let statusCode = err.statusCode || 500;
+  let status =
+    err.status || (`${statusCode}`.startsWith("4") ? "fail" : "error");
   let message = err.message;
 
   if (err.name === "ValidationError") {
@@ -24,9 +26,10 @@ const errorHandler = (err, req, res, next) => {
   if (statusCode === 500) {
     console.error(err);
     message = `Internal Server Error`;
+    status = "error";
   }
 
-  res.status(statusCode).json({ message });
+  res.status(statusCode).json({ status, message });
 };
 
 module.exports = errorHandler;

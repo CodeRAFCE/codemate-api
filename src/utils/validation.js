@@ -1,14 +1,20 @@
 const validator = require("validator");
+const AppError = require("./AppError");
 
 const validateSignUpData = (req) => {
   const { firstName, lastName, emailId, password } = req.body;
+
+  const missing = [firstName, lastName, emailId, password].some(
+    (v) => typeof v !== "string" || !v.trim(),
+  );
+
   // Optional: Basic presence check (Mongoose schema also validates required fields)
-  if (!firstName || !lastName) {
-    throw new Error("Name cannot be empty");
+  if (missing) {
+    throw new AppError("All Fields are required", 400);
   } else if (!validator.isEmail(emailId)) {
-    throw new Error("Email id is invalid");
+    throw new AppError("Email id is invalid", 400);
   } else if (!validator.isStrongPassword(password)) {
-    throw new Error("Password is weak, Please enter strong password");
+    throw new AppError("Password is weak, Please enter strong password", 400);
   }
 };
 
@@ -26,11 +32,11 @@ const validateProfileEditData = (req) => {
   ];
 
   if (about && about.length > 300) {
-    throw new Error("about character limit exceeded");
+    throw new AppError("about character limit exceeded", 400);
   } else if (skills && skills.length > 10) {
-    throw new Error("skills limit exceeded");
+    throw new AppError("skills limit exceeded", 400);
   } else if (photoUrl && !validator.isURL(photoUrl)) {
-    throw new Error("Incorrect photoUrl format");
+    throw new AppError("Incorrect photoUrl format", 400);
   }
 
   const isProfileEditAllowed = Object.keys(req.body).every((field) =>

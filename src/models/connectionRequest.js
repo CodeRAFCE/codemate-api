@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const AppError = require("../utils/AppError");
 
 const requestSchema = new mongoose.Schema(
   {
@@ -31,7 +32,7 @@ requestSchema.pre("save", function () {
   const connectionRequest = this;
 
   if (connectionRequest.fromUserId.equals(connectionRequest.toUserId)) {
-    throw new Error("Cannot send connection request to yourself!");
+    throw new AppError("Cannot send connection request to yourself!", 400);
   }
 });
 

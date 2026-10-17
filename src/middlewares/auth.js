@@ -1,34 +1,16 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-
-const adminAuth = (req, res, next) => {
-  const token = "abc";
-  const isAuthorizedAdmin = token === "abc";
-
-  if (!isAuthorizedAdmin) {
-    res.status(401).send("Unauthorized admin Access");
-  } else {
-    next();
-  }
-};
+const AppError = require("../utils/AppError");
 
 const userAuth = async (req, res, next) => {
   try {
-    const cookies = req.cookies;
-    const { token } = cookies;
+    const { token } = req.cookies;
+    if (!token) throw new AppError("INVALID TOKEN", 401);
 
-    if (!token) {
-      throw new Error("INVALID TOKEN");
-    }
-
-    const userData = await jwt.verify(token, process.env.JWT_SECRET);
-    const { _id } = userData;
-
-    const user = await User.findById(_id);
-
-    if (!user) {
-      throw new Error("User not found");
-    } 
+    const { _id } = await jwt.verify(token, process.env.JWT_SECRET);
+    // Exculde password when fetching the data
+    const user = await User.findById(_id).select("-password");
+    if (!user) throw new AppError("User not found", 401);
 
     req.user = user;
     next();
@@ -38,6 +20,5 @@ const userAuth = async (req, res, next) => {
 };
 
 module.exports = {
-  adminAuth,
   userAuth,
 };
