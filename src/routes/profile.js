@@ -48,7 +48,7 @@ profileRouter.patch("/edit", userAuth, async (req, res) => {
 
     Object.keys(req.body).forEach((key) => (loggedInUser[key] = req.body[key]));
     await loggedInUser.save(); // SAVE to DB
-    
+
     res.send("User updated successfully");
   } catch (error) {
     throw new Error("ERROR: " + error);
@@ -58,7 +58,7 @@ profileRouter.patch("/edit", userAuth, async (req, res) => {
 profileRouter.patch("/password", userAuth, async (req, res) => {
   try {
     const { newPassword } = req.body;
-    if (!validator.isStrongPassword) {
+    if (!newPassword || !validator.isStrongPassword(newPassword)) {
       throw new Error("Provide a strong password");
     }
 
