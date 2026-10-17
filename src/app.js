@@ -4,6 +4,7 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const { connectDB } = require("./config/database");
 const apiRouter = require("./routes/index");
+const errorHandler = require("./middlewares/errorHandler");
 
 const app = express();
 const PORT = 3000;
@@ -17,6 +18,10 @@ app.use(cookieParser());
 
 // APIs list
 app.use("/api", apiRouter);
+app.use((req, res) => res.status(404).json({ message: "Route not found" }));
+
+// Always last we need to hit apiRouter to actually get these errors
+app.use(errorHandler);
 
 // * Always connect to DB and then listen to the server
 connectDB()

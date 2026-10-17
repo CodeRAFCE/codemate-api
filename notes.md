@@ -88,3 +88,56 @@ res.send({ firstName: "Seshan", lastName: "A" });
 - GET /user/feed
 
 # Express Router express.router()
+
+# What a Mongoose ValidationError looks like:
+
+```JS
+{
+  name: 'ValidationError',
+  message: 'User validation failed: email: Path `email`is required.',
+  errors: {
+    email: {
+      name: 'ValidatorError',
+      message: 'Path`email` is required.',
+      properties: { ... },
+      kind: 'required',
+      path: 'email',
+      value: undefined
+    }
+  }
+}
+```
+
+# How express.json() shows error when JSON body is Invalid
+
+```JS
+{
+  expose: true,
+  statusCode: 400,
+  status: 400,
+  type: 'entity.parse.failed',  // <--- This identifier
+  body: '{\n  "firstName": "John",\n}',
+  message: 'Unexpected token } in JSON at position 29'
+}
+```
+
+# How JWT throws error for Invalid and Expired token
+
+## JsonWebTokenError (err.name === "JsonWebTokenError")
+
+```JS
+{
+  name: 'JsonWebTokenError',
+  message: 'invalid signature' // or 'jwt malformed', 'jwt must be provided'
+}
+```
+
+## TokenExpiredError (err.name === "TokenExpiredError")
+
+```JS
+{
+  name: 'TokenExpiredError',
+  message: 'jwt expired',
+  expiredAt: 2026-10-17T20:30:00.000Z
+}
+```
