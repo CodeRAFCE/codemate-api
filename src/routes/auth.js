@@ -35,6 +35,10 @@ authRouter.post("/sign-up", async (req, res) => {
 authRouter.post("/login", async (req, res) => {
   const { emailId, password } = req.body;
 
+  if (!emailId || !password) {
+    throw new AppError("Email and password are required", 400);
+  }
+
   const user = await User.findOne({ emailId });
   if (!user || !(await user.validatePassword(password))) {
     throw new AppError("INVALID CREDENTIALS", 401);

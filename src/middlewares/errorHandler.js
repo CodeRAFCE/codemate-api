@@ -1,7 +1,5 @@
 const errorHandler = (err, req, res, _next) => {
   let statusCode = err.statusCode || 500;
-  let status =
-    err.status || (`${statusCode}`.startsWith("4") ? "fail" : "error");
   let message = err.message;
 
   if (err.name === "ValidationError") {
@@ -22,6 +20,10 @@ const errorHandler = (err, req, res, _next) => {
     statusCode = 400; // Malformed JSON req body
     message = `Invalid JSON body`;
   }
+
+  // Calculate status AFTER determining final statusCode
+  let status =
+    err.status || (`${statusCode}`.startsWith("4") ? "fail" : "error");
 
   if (statusCode === 500) {
     console.error(err);
