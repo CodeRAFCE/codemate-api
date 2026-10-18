@@ -1,10 +1,11 @@
-require("dotenv").config();
+import "dotenv/config";
+import type { Request, Response } from "express";
 
-const express = require("express");
-const cookieParser = require("cookie-parser");
-const { connectDB } = require("./config/database");
-const apiRouter = require("./routes/index");
-const errorHandler = require("./middlewares/errorHandler");
+import express from "express";
+import cookieParser from "cookie-parser";
+import { connectDB } from "./config/database.ts";
+import apiRouter from "./routes/index.ts";
+import errorHandler from "./middlewares/errorHandler.ts";
 
 const app = express();
 const PORT = 3000;
@@ -18,7 +19,9 @@ app.use(cookieParser());
 
 // APIs list
 app.use("/api", apiRouter);
-app.use((req, res) => res.status(404).json({ message: "Route not found" }));
+app.use((_req: Request, res: Response) =>
+  res.status(404).json({ message: "Route not found" }),
+);
 
 // Always last we need to hit apiRouter to actually get these errors
 app.use(errorHandler);
@@ -31,4 +34,4 @@ connectDB()
       console.log(`Server starting in port => ${PORT}`);
     });
   })
-  .catch((err) => console.error("Database cannot be connected", err));
+  .catch((err: Error) => console.error("Database cannot be connected", err));

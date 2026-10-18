@@ -1,4 +1,11 @@
-const errorHandler = (err, req, res, _next) => {
+import type { Request, Response, NextFunction } from "express";
+
+const errorHandler = (
+  err: unknown,
+  req: Request,
+  res: Response,
+  _next: NextFunction,
+) => {
   let statusCode = err.statusCode || 500;
   let message = err.message;
 
@@ -34,4 +41,4 @@ const errorHandler = (err, req, res, _next) => {
   res.status(statusCode).json({ status, message });
 };
 
-module.exports = errorHandler;
+export default errorHandler;

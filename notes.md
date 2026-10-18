@@ -313,3 +313,18 @@ Put both before your routes.
 ## 7. Remember
 
 Headers are an extra layer, not a replacement for the basics: input validation, password hashing, secrets kept out of the code, and updated dependencies. Hiding `X-Powered-By` makes scanning slightly harder, but it is not real security on its own.
+
+---
+
+# How to handle unknown type in Typescript
+
+```JS
+//  Using 'unknown' (The Professional way):
+let reqBodyUnknown: unknown = JSON.parse('{"emailId": "test@dev.com"}');
+// reqBodyUnknown.emailId; // ❌ TS Error: Object is of type 'unknown'
+
+// You must prove the type first:
+if (typeof reqBodyUnknown === "object" && reqBodyUnknown !== null && "emailId" in reqBodyUnknown) {
+  console.log((reqBodyUnknown as { emailId: string }).emailId); //  Safe!
+}
+```

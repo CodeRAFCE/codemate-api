@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const AppError = require("../utils/AppError");
+import mongoose, { Connection } from "mongoose";
+import AppError from "../utils/AppError.ts";
 
 const requestSchema = new mongoose.Schema(
   {
@@ -37,4 +37,5 @@ requestSchema.pre("save", function () {
 });
 
 const ConnectionRequest = mongoose.model("ConnectionRequest", requestSchema);
-module.exports = ConnectionRequest;
+
+export default ConnectionRequest;

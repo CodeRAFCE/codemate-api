@@ -1,4 +1,4 @@
-function isNonEmptyObject(obj) {
+function isNonEmptyObject(obj: Object) {
   return (
     obj !== null &&
     typeof obj === "object" &&
@@ -7,4 +7,4 @@ function isNonEmptyObject(obj) {
   );
 }
 
-module.exports = { isNonEmptyObject };
+export default isNonEmptyObject;

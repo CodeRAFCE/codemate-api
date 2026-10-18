@@ -1,13 +1,13 @@
-const express = require("express");
-const bcrypt = require("bcrypt");
-const User = require("../models/user");
-const { validateSignUpData } = require("../utils/validation");
-const { userAuth } = require("../middlewares/auth");
-const AppError = require("../utils/AppError");
+import express, { type CookieOptions } from "express";
+import bcrypt from "bcrypt";
+import User from "../models/user.ts";
+import { validateSignUpData } from "../utils/validation.ts";
+import { userAuth } from "../middlewares/auth.ts";
+import AppError from "../utils/AppError.ts";
 
 const authRouter = express.Router();
 
-const cookieOptions = {
+const cookieOptions: CookieOptions = {
   httpOnly: true, //"Browser JavaScript cannot touch or steal this cookie.(Protects from XSS)"
   sameSite: "lax", //"Only send this cookie if the user is actually on my website."
   secure: process.env.NODE_ENV === "production", //"Only send this cookie over encrypted HTTPS connections."
@@ -58,10 +58,6 @@ authRouter.post("/logout", userAuth, (req, res) => {
   res
     .clearCookie("token", cookieOptions)
     .json({ status: "success", message: "Logout Successfull" });
-
-  // OR
-  // .cookie("token", null, { expires: new Date(Date.now()) })
-  // .send("Logout successful");
 });
 
 module.exports = authRouter;

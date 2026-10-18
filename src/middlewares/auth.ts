@@ -1,8 +1,14 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/user");
-const AppError = require("../utils/AppError");
+import type { Request, Response, NextFunction } from "express";
 
-const userAuth = async (req, res, next) => {
+import jwt from "jsonwebtoken";
+import User from "../models/user.ts";
+import AppError from "../utils/AppError.ts";
+
+export const userAuth = async (
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+) => {
   const { token } = req.cookies;
   if (!token) throw new AppError("INVALID TOKEN", 401);
 
@@ -13,8 +19,4 @@ const userAuth = async (req, res, next) => {
 
   req.user = user;
   next();
-};
-
-module.exports = {
-  userAuth,
 };

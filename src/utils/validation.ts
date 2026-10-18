@@ -1,7 +1,8 @@
-const validator = require("validator");
-const AppError = require("./AppError");
+import type { Request } from "express";
+import validator from "validator";
+import AppError from "./AppError.ts";
 
-const validateSignUpData = (req) => {
+export const validateSignUpData = (req: Request) => {
   const { firstName, lastName, emailId, password } = req.body;
 
   const missing = [firstName, lastName, emailId, password].some(
@@ -18,7 +19,7 @@ const validateSignUpData = (req) => {
   }
 };
 
-const validateProfileEditData = (req) => {
+export const validateProfileEditData = (req: Request) => {
   const { about, skills, photoUrl } = req.body;
 
   const allowedEditFields = [
@@ -45,5 +46,3 @@ const validateProfileEditData = (req) => {
 
   return isProfileEditAllowed;
 };
-
-module.exports = { validateSignUpData, validateProfileEditData };
