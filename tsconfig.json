@@ -8,6 +8,7 @@
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "target": "es2022",
+    // For better DX avoid .ts extension using module & moduleResolution
     "module": "esnext",
     "moduleResolution": "bundler",
     "types": ["node"],
