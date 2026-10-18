@@ -1,8 +1,8 @@
-const express = require("express");
-const { userAuth } = require("../middlewares/auth");
-const ConnectionRequest = require("../models/connectionRequest");
-const User = require("../models/user");
-const AppError = require("../utils/AppError");
+import express from "express";
+import { userAuth } from "../middlewares/auth.ts";
+import ConnectionRequest from "../models/connectionRequest.ts";
+import User from "../models/user.ts";
+import AppError from "../utils/AppError.ts";
 
 const requestRouter = express.Router();
 
@@ -84,4 +84,4 @@ requestRouter.patch("/review/:status/:reqId", userAuth, async (req, res) => {
   });
 });
 
-module.exports = requestRouter;
+export default requestRouter;

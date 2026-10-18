@@ -60,4 +60,4 @@ authRouter.post("/logout", userAuth, (req, res) => {
     .json({ status: "success", message: "Logout Successfull" });
 });
 
-module.exports = authRouter;
+export default authRouter;

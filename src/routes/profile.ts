@@ -1,9 +1,9 @@
-const express = require("express");
-const bcrypt = require("bcrypt");
-const validator = require("validator");
-const { userAuth } = require("../middlewares/auth");
-const { validateProfileEditData } = require("../utils/validation");
-const AppError = require("../utils/AppError");
+import express from "express";
+import bcrypt from "bcrypt";
+import validator from "validator";
+import { userAuth } from "../middlewares/auth.ts";
+import { validateProfileEditData } from "../utils/validation.ts";
+import AppError from "../utils/AppError.ts";
 
 const profileRouter = express.Router();
 
@@ -48,4 +48,4 @@ profileRouter.patch("/password", userAuth, async (req, res) => {
   });
 });
 
-module.exports = profileRouter;
+export default profileRouter;

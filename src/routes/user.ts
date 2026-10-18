@@ -1,7 +1,7 @@
-const express = require("express");
-const { userAuth } = require("../middlewares/auth");
-const ConnectionRequest = require("../models/connectionRequest");
-const User = require("../models/user");
+import express from "express";
+import { userAuth } from "../middlewares/auth.ts";
+import ConnectionRequest from "../models/connectionRequest.ts";
+import User from "../models/user.ts";
 
 const userRouter = express.Router();
 
@@ -109,7 +109,7 @@ userRouter.get("/feed", userAuth, async (req, res) => {
   res.json({ status: "success", message: "Data fetched", users });
 });
 
-module.exports = userRouter;
+export default userRouter;
 
 /**
  * When you are logged in => User A, User can be both sender and receiver
