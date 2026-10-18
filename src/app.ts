@@ -3,9 +3,9 @@ import type { Request, Response } from "express";
 
 import express from "express";
 import cookieParser from "cookie-parser";
-import { connectDB } from "./config/database.ts";
-import apiRouter from "./routes/index.ts";
-import errorHandler from "./middlewares/errorHandler.ts";
+import { connectDB } from "./config/database";
+import apiRouter from "./routes/index";
+import errorHandler from "./middlewares/errorHandler";
 
 const app = express();
 const PORT = 3000;

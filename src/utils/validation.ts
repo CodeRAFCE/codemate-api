@@ -1,6 +1,6 @@
 import type { Request } from "express";
 import validator from "validator";
-import AppError from "./AppError.ts";
+import AppError from "./AppError";
 
 export const validateSignUpData = (req: Request) => {
   const { firstName, lastName, emailId, password } = req.body;

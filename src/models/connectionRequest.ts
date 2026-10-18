@@ -1,5 +1,5 @@
 import mongoose, { Connection } from "mongoose";
-import AppError from "../utils/AppError.ts";
+import AppError from "../utils/AppError";
 
 const requestSchema = new mongoose.Schema(
   {

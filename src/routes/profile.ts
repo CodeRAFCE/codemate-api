@@ -1,9 +1,9 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import validator from "validator";
-import { userAuth } from "../middlewares/auth.ts";
-import { validateProfileEditData } from "../utils/validation.ts";
-import AppError from "../utils/AppError.ts";
+import { userAuth } from "../middlewares/auth";
+import { validateProfileEditData } from "../utils/validation";
+import AppError from "../utils/AppError";
 
 const profileRouter = express.Router();
 

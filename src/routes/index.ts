@@ -1,9 +1,9 @@
 import express from "express";
 
-import authRouter from "./auth.ts";
-import profileRouter from "./profile.ts";
-import requestRouter from "./request.ts";
-import userRouter from "./user.ts";
+import authRouter from "./auth";
+import profileRouter from "./profile";
+import requestRouter from "./request";
+import userRouter from "./user";
 
 const router = express.Router();
 

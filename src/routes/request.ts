@@ -1,8 +1,8 @@
 import express from "express";
-import { userAuth } from "../middlewares/auth.ts";
-import ConnectionRequest from "../models/connectionRequest.ts";
-import User from "../models/user.ts";
-import AppError from "../utils/AppError.ts";
+import { userAuth } from "../middlewares/auth";
+import ConnectionRequest from "../models/connectionRequest";
+import User from "../models/user";
+import AppError from "../utils/AppError";
 
 const requestRouter = express.Router();
 

@@ -1,9 +1,9 @@
 import express, { type CookieOptions } from "express";
 import bcrypt from "bcrypt";
-import User from "../models/user.ts";
-import { validateSignUpData } from "../utils/validation.ts";
-import { userAuth } from "../middlewares/auth.ts";
-import AppError from "../utils/AppError.ts";
+import User from "../models/user";
+import { validateSignUpData } from "../utils/validation";
+import { userAuth } from "../middlewares/auth";
+import AppError from "../utils/AppError";
 
 const authRouter = express.Router();
 

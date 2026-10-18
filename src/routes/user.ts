@@ -1,7 +1,7 @@
 import express from "express";
-import { userAuth } from "../middlewares/auth.ts";
-import ConnectionRequest from "../models/connectionRequest.ts";
-import User from "../models/user.ts";
+import { userAuth } from "../middlewares/auth";
+import ConnectionRequest from "../models/connectionRequest";
+import User from "../models/user";
 
 const userRouter = express.Router();
 
