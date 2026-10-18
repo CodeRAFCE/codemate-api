@@ -2,7 +2,7 @@ import type { Request } from "express";
 import validator from "validator";
 import AppError from "./AppError";
 
-export const validateSignUpData = (req: Request) => {
+export const validateSignUpData = (req: Request): void => {
   const { firstName, lastName, emailId, password } = req.body;
 
   const missing = [firstName, lastName, emailId, password].some(
@@ -19,7 +19,7 @@ export const validateSignUpData = (req: Request) => {
   }
 };
 
-export const validateProfileEditData = (req: Request) => {
+export const validateProfileEditData = (req: Request): boolean => {
   const { about, skills, photoUrl } = req.body;
 
   const allowedEditFields = [

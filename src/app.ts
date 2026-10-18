@@ -1,5 +1,4 @@
 import "dotenv/config";
-import type { Request, Response } from "express";
 
 import express from "express";
 import cookieParser from "cookie-parser";
@@ -19,9 +18,7 @@ app.use(cookieParser());
 
 // APIs list
 app.use("/api", apiRouter);
-app.use((_req: Request, res: Response) =>
-  res.status(404).json({ message: "Route not found" }),
-);
+app.use((_req, res) => res.status(404).json({ message: "Route not found" }));
 
 // Always last we need to hit apiRouter to actually get these errors
 app.use(errorHandler);
