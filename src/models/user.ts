@@ -66,7 +66,7 @@ const userSchema = new mongoose.Schema(
 //
 userSchema.index({ firstName: 1, lastName: 1 });
 
-userSchema.methods.getJWT = async function () {
+userSchema.methods.getJWT = async function (): Promise<string> {
   const user = this;
 
   const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
@@ -76,7 +76,9 @@ userSchema.methods.getJWT = async function () {
   return token;
 };
 
-userSchema.methods.validatePassword = async function (passwordByUser: string) {
+userSchema.methods.validatePassword = async function (
+  passwordByUser: string,
+): Promise<boolean> {
   const user = this;
   const isPasswordValid = await bcrypt.compare(passwordByUser, user.password);
   return isPasswordValid;

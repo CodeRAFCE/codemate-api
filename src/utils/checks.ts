@@ -1,4 +1,4 @@
-function isNonEmptyObject(obj: Object) {
+function isNonEmptyObject(obj: Object): boolean {
   return (
     obj !== null &&
     typeof obj === "object" &&

@@ -1,14 +1,10 @@
-import type { Request, Response, NextFunction } from "express";
+import type { RequestHandler } from "express";
 
 import jwt from "jsonwebtoken";
 import User from "../models/user";
 import AppError from "../utils/AppError";
 
-export const userAuth = async (
-  req: Request,
-  _res: Response,
-  next: NextFunction,
-) => {
+export const userAuth: RequestHandler = async (req, _res, next) => {
   const { token } = req.cookies;
   if (!token) throw new AppError("INVALID TOKEN", 401);
 

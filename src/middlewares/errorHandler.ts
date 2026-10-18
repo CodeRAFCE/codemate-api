@@ -1,11 +1,6 @@
-import type { Request, Response, NextFunction } from "express";
+import type { ErrorRequestHandler } from "express";
 
-const errorHandler = (
-  err: unknown,
-  req: Request,
-  res: Response,
-  _next: NextFunction,
-) => {
+const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   let statusCode = err.statusCode || 500;
   let message = err.message;
 
