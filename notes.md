@@ -100,6 +100,8 @@ app.use(
 
 # Express Router express.router()
 
+---
+
 # What a Mongoose ValidationError looks like:
 
 ```JS
@@ -119,6 +121,8 @@ app.use(
 }
 ```
 
+---
+
 # How express.json() shows error when JSON body is Invalid
 
 ```JS
@@ -131,6 +135,8 @@ app.use(
   message: 'Unexpected token } in JSON at position 29'
 }
 ```
+
+---
 
 # How JWT throws error for Invalid and Expired token
 
@@ -152,6 +158,8 @@ app.use(
   expiredAt: 2026-10-17T20:30:00.000Z
 }
 ```
+
+---
 
 # Cookie Options
 
@@ -185,3 +193,123 @@ const cookieOptions = {
 # Math.max(minimum, value) → Sets a FLOOR (The number cannot drop below this).
 
 # Math.min(maximum, value) → Sets a CEILING (The number cannot go above this).
+
+---
+
+---
+
+# HTTP Security Headers: Simple Notes
+
+There are two kinds of headers to think about: headers you **hide** because they reveal information, and headers you **add** because they tell the browser to behave safely. `helmet()` handles most of both in Express.
+
+---
+
+## 1. Headers to hide (they leak information)
+
+| Header         | What it reveals                        | Fix                                                     |
+| -------------- | -------------------------------------- | ------------------------------------------------------- |
+| `X-Powered-By` | Your framework (Express)               | Helmet removes it                                       |
+| `Server`       | Web server and version (Nginx, Apache) | Usually set at the server or host level, not in Express |
+
+The idea is to avoid telling attackers exactly which software and version to look up vulnerabilities for.
+
+---
+
+## 2. Headers to add (they protect the user)
+
+### `Strict-Transport-Security` (HSTS)
+
+Tells the browser: "only ever talk to this site over HTTPS, even if someone types http." It stops attackers from downgrading the connection.
+
+### `X-Content-Type-Options: nosniff`
+
+Tells the browser to trust the content type you declared and not guess. This blocks tricks where a file pretending to be an image is run as a script.
+
+### `Content-Security-Policy` (CSP)
+
+Lists which sources a page may load scripts, styles, and images from. It is the main defense against XSS, because injected scripts from unknown sources get blocked. It is the most powerful header and also the hardest to configure.
+
+### `X-Frame-Options` (or CSP `frame-ancestors`)
+
+Stops other websites from embedding your page in an invisible frame. This prevents clickjacking, where a user is tricked into clicking something hidden.
+
+### `Referrer-Policy`
+
+Controls how much of your URL is sent to other sites when someone follows a link. It keeps private details in URLs from leaking.
+
+### `Cross-Origin-Resource-Policy` and `Cross-Origin-Opener-Policy`
+
+Limit which other sites can load your resources or interact with your windows. They protect against some cross-site data leaks.
+
+---
+
+## 3. Headers you control yourself
+
+- **`Set-Cookie` flags**
+  - `httpOnly`: JavaScript cannot read the cookie (protects against XSS theft).
+  - `secure`: the cookie is sent over HTTPS only.
+  - `sameSite`: the cookie is not sent on cross-site requests (helps against CSRF).
+- **CORS headers (`Access-Control-Allow-Origin`)**: decide which websites may call your API from a browser. Allow only your own frontend's origin. Never use `*` together with cookies, because browsers reject it and it signals a misconfiguration.
+- **`Cache-Control`**: for responses with private data, use `no-store` so browsers and proxies do not keep a copy.
+
+---
+
+## 4. What matters for DevTinder
+
+DevTinder is a JSON API, not an HTML site, so:
+
+- **Matters most:** removing `X-Powered-By`, HSTS (once deployed over HTTPS), `nosniff`, cookie flags, correct CORS, and `no-store` on private responses.
+- **Matters less:** CSP and frame headers. They protect pages rendered in a browser, which is the React frontend's job (set them where the frontend is hosted, such as Vercel).
+
+Helmet's defaults cover the first group and set safe defaults for the others:
+
+```bash
+npm install helmet
+```
+
+```js
+const helmet = require("helmet");
+
+app.use(helmet()); // also removes X-Powered-By
+```
+
+If you only want to remove the Express header:
+
+```js
+app.disable("x-powered-by");
+```
+
+### Rate limiting on login (a related, cheap protection)
+
+```bash
+npm install express-rate-limit
+```
+
+```js
+const rateLimit = require("express-rate-limit");
+
+// 10 login attempts per IP every 15 minutes
+app.use("/api/auth/login", rateLimit({ windowMs: 15 * 60 * 1000, max: 10 }));
+```
+
+Put both before your routes.
+
+---
+
+## 5. How to check
+
+- **DevTools:** Network tab, click a request, and read the Response Headers.
+- **Terminal:** `curl -I https://your-deployed-url/api/...`
+- **Online scanner:** securityheaders.com grades a deployed site's headers. Run it on your Render URL once deployed.
+
+---
+
+## 6. One-line interview answer
+
+> "I use Helmet for the standard security headers, set `httpOnly`, `secure`, and `sameSite` on cookies, restrict CORS to my frontend's origin, and rate-limit login. Headers are one layer, and input validation and dependency updates do most of the work."
+
+---
+
+## 7. Remember
+
+Headers are an extra layer, not a replacement for the basics: input validation, password hashing, secrets kept out of the code, and updated dependencies. Hiding `X-Powered-By` makes scanning slightly harder, but it is not real security on its own.
