@@ -54,7 +54,7 @@ authRouter.post("/login", async (req, res) => {
   res.status(200).json({ status: "success", message: "Logged in" });
 });
 
-authRouter.post("/logout", userAuth, (req, res) => {
+authRouter.post("/logout", userAuth, (_req, res) => {
   res
     .clearCookie("token", cookieOptions)
     .json({ status: "success", message: "Logout Successfull" });

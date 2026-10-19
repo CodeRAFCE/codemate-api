@@ -1,11 +1,21 @@
 import type { ErrorRequestHandler } from "express";
+import AppError from "../utils/AppError";
+
+type StatusType = "fail" | "error";
 
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
-  let statusCode = err.statusCode || 500;
-  let message = err.message;
+  let statusCode: number = 500;
+  let message: string = "Internal Server Error";
+  let status: StatusType = "error";
 
-  if (err.name === "ValidationError") {
+  if (err instanceof AppError) {
+    statusCode = err.statusCode;
+    status = err.status;
+    message = err.message;
+  } else if (err.name === "ValidationError") {
     statusCode = 400; // Mongoose schema Validation
+    status = "fail";
+    message = err.message;
   } else if (err.code === 11000) {
     statusCode = 409; // duplicate key (Eg: email already used)
     message = "Resource already exists";
@@ -24,13 +34,10 @@ const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   }
 
   // Calculate status AFTER determining final statusCode
-  let status =
-    err.status || (`${statusCode}`.startsWith("4") ? "fail" : "error");
+  status = err.status || (`${statusCode}`.startsWith("4") ? "fail" : "error");
 
   if (statusCode === 500) {
-    console.error(err);
-    message = `Internal Server Error`;
-    status = "error";
+    console.error("💥 UNEXPECTED SERVER ERROR:", err);
   }
 
   res.status(statusCode).json({ status, message });
