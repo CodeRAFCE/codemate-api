@@ -9,6 +9,13 @@ export interface IUserMethods {
   validatePassword(passwordByUser: string): Promise<boolean>;
 }
 
+/**
+["male", "female", "other"] as const
+         ↓ (typeof)
+readonly ["male", "female", "other"]
+         ↓ ([number] = index 0 | index 1 | index 2)
+"male" | "female" | "other"
+ */
 const GENDERS = ["male", "female", "others"] as const;
 export type GenderType = (typeof GENDERS)[number];
 
