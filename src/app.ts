@@ -2,12 +2,14 @@ import "dotenv/config";
 
 import express from "express";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
 import { connectDB } from "./config/database";
 import apiRouter from "./routes/index";
 import errorHandler from "./middlewares/errorHandler";
 
 const app = express();
 const PORT = 3000;
+app.use(helmet());
 
 // middleware to covert your all json data to JS object so req.body is not undefined
 // req.body will log undefined if you don't use express.json()

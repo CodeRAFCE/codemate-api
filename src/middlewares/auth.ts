@@ -3,7 +3,6 @@ import type { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/user";
 import AppError from "../utils/AppError";
-import { cookieOptions } from "../config/cookie";
 
 interface JwtPayloadWithId {
   _id: string;
