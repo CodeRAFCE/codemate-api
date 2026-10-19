@@ -1,4 +1,5 @@
 import "dotenv/config";
+import "./config/env";
 
 import express from "express";
 import cookieParser from "cookie-parser";

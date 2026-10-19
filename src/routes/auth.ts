@@ -53,7 +53,7 @@ authRouter.post("/login", guestOnly, async (req, res) => {
 
   res.cookie("token", token, {
     ...cookieOptions,
-    expires: new Date(Date.now() + 24 * 3600000), // expires in 1h, change 1 to 24 will expire in 1d
+    expires: new Date(Date.now() + 24 * 3600000), // expires in 1d, change 24 - 1 will expire in 1h
   });
 
   res.status(200).json({ status: "success", message: "Logged in" });
