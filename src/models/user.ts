@@ -10,11 +10,11 @@ export interface IUserMethods {
 }
 
 /**
-["male", "female", "other"] as const
+["male", "female", "others"] as const
          ↓ (typeof)
-readonly ["male", "female", "other"]
+readonly ["male", "female", "others"]
          ↓ ([number] = index 0 | index 1 | index 2)
-"male" | "female" | "other"
+"male" | "female" | "others"
  */
 const GENDERS = ["male", "female", "others"] as const;
 export type GenderType = (typeof GENDERS)[number];

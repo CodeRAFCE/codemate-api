@@ -14,11 +14,11 @@ const requestRouter = express.Router();
 
 requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
   const { status, toUserId } = req.params;
-  
+
   if (!req.user) throw new AppError("Unauthorized Access", 401);
   if (!toUserId) throw new AppError("Invalid User ID", 400);
 
-  const fromUserId = req.user?._id;
+  const fromUserId = req.user._id;
 
   const toUser = await User.findById(toUserId);
   if (!toUser) throw new AppError("User not found", 404);
