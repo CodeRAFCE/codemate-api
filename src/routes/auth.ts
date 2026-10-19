@@ -1,4 +1,14 @@
-import express, { type CookieOptions } from "express";
+import type { CookieOptions } from "express";
+import type { UserType } from "../models/user";
+
+type SignUpBodyType = Pick<
+  UserType,
+  "firstName" | "lastName" | "emailId" | "password"
+>;
+
+type LoginBodyType = Pick<UserType, "emailId" | "password">;
+
+import express from "express";
 import bcrypt from "bcrypt";
 import User from "../models/user";
 import { validateSignUpData } from "../utils/validation";
@@ -15,7 +25,7 @@ const cookieOptions: CookieOptions = {
 
 authRouter.post("/sign-up", async (req, res) => {
   validateSignUpData(req);
-  const { firstName, lastName, emailId, password } = req.body;
+  const { firstName, lastName, emailId, password }: SignUpBodyType = req.body;
   const passwardHash = await bcrypt.hash(password, 10);
 
   // Only allowed fields are passed to the model
@@ -33,7 +43,7 @@ authRouter.post("/sign-up", async (req, res) => {
 });
 
 authRouter.post("/login", async (req, res) => {
-  const { emailId, password } = req.body;
+  const { emailId, password }: LoginBodyType = req.body;
 
   if (!emailId || !password) {
     throw new AppError("Email and password are required", 400);

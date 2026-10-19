@@ -1,4 +1,4 @@
-import type { HydratedDocument, InferSchemaType, Model } from "mongoose";
+import type { HydratedDocument, InferSchemaType } from "mongoose";
 import mongoose from "mongoose";
 import AppError from "../utils/AppError";
 
@@ -49,9 +49,9 @@ requestSchema.pre("save", function () {
   }
 });
 
-const ConnectionRequest = mongoose.model<
-  ConnectionRequestType,
-  Model<ConnectionRequestType>
->("ConnectionRequest", requestSchema);
+const ConnectionRequest = mongoose.model<ConnectionRequestType>(
+  "ConnectionRequest",
+  requestSchema,
+);
 
 export default ConnectionRequest;
