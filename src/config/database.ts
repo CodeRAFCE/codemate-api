@@ -4,8 +4,7 @@ import mongoose from "mongoose";
 import dns from "dns";
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
-const uri = process.env?.MONGODB_URI;
-if (!uri) throw new Error("MONGODB_URI env variable is not set!");
+const uri = process.env.MONGODB_URI;
 
 export const connectDB = async (): Promise<typeof mongoose> =>
   await mongoose.connect(uri);

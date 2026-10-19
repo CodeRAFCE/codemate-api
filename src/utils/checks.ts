@@ -1,4 +1,6 @@
-function isNonEmptyObject(obj: Object): boolean {
+//Avoid: let data: Object;
+// too vague. Prefer Record<string, unknown> or specific shapes.
+export function isNonEmptyObject(obj: Record<string, unknown>): boolean {
   return (
     obj !== null &&
     typeof obj === "object" &&
@@ -7,4 +9,3 @@ function isNonEmptyObject(obj: Object): boolean {
   );
 }
 
-export default isNonEmptyObject;

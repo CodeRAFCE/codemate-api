@@ -88,10 +88,8 @@ userSchema.index({ firstName: 1, lastName: 1 });
 
 userSchema.methods.getJWT = async function (): Promise<string> {
   const user = this;
-  const secret = process.env.JWT_SECRET;
-  if (!secret) throw new Error("Secret Key is not configured");
 
-  const token = await jwt.sign({ _id: user._id }, secret, {
+  const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "1d",
   });
 

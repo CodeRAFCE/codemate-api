@@ -328,3 +328,104 @@ if (typeof reqBodyUnknown === "object" && reqBodyUnknown !== null && "emailId" i
   console.log((reqBodyUnknown as { emailId: string }).emailId); //  Safe!
 }
 ```
+
+---
+
+# `Error.captureStackTrace(this, this.constructor)`
+
+```typescript
+class AppError extends Error {
+  public statusCode: number;
+  public status: "fail" | "error";
+
+  constructor(message: string, statusCode: number = 500) {
+    super(message);
+    this.statusCode = statusCode;
+    this.status = `${statusCode}`.startsWith("4") ? "fail" : "error";
+
+    // Captures clean stack trace (Node/V8 only)
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+```
+
+### 1. What is a "Stack Trace"?
+Whenever an error crashes or gets logged in Node.js, you see a list of file names and line numbers showing **the path the code took right before the crash**:
+
+```text
+Error: All Fields are required
+    at new AppError (src/utils/AppError.ts:13:5)   <-- Constructor line
+    at validateSignUpData (src/utils/validation.ts:14:11)
+    at authRouter.post (src/routes/auth.ts:17:3)
+```
+
+### 2. The Problem Without `captureStackTrace`
+Notice the first line in the trace:
+> `at new AppError (src/utils/AppError.ts:13:5)`
+
+As a developer debugging your app, you already know `AppError` was instantiated—**you don't care about the internal line inside `AppError.ts`**! 
+What you actually care about is **where in your business logic the error was triggered** (e.g., inside `validation.ts` or `auth.ts`).
+
+### 3. What `Error.captureStackTrace(this, this.constructor)` does:
+It tells Node's V8 engine:
+> *"When generating the stack trace for `this` error instance, **omit the `AppError` constructor itself** from the trace. Start the trace from where `new AppError(...)` was actually called."*
+
+#### Result:
+The internal `AppError` line is cleanly stripped out:
+```text
+Error: All Fields are required
+    at validateSignUpData (src/utils/validation.ts:14:11)  <-- Clean! Starts right where it happened!
+    at authRouter.post (src/routes/auth.ts:17:3)
+```
+It keeps terminal and production logs clean, concise, and focused on the real source of the bug.
+
+---
+
+# `Error.captureStackTrace(this, this.constructor)`
+
+```typescript
+class AppError extends Error {
+  public statusCode: number;
+  public status: "fail" | "error";
+
+  constructor(message: string, statusCode: number = 500) {
+    super(message);
+    this.statusCode = statusCode;
+    this.status = `${statusCode}`.startsWith("4") ? "fail" : "error";
+
+    // Captures clean stack trace (Node/V8 only)
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+```
+
+### 1. What is a "Stack Trace"?
+Whenever an error crashes or gets logged in Node.js, you see a list of file names and line numbers showing **the path the code took right before the crash**:
+
+```text
+Error: All Fields are required
+    at new AppError (src/utils/AppError.ts:13:5)   <-- Constructor line
+    at validateSignUpData (src/utils/validation.ts:14:11)
+    at authRouter.post (src/routes/auth.ts:17:3)
+```
+
+### 2. The Problem Without `captureStackTrace`
+Notice the first line in the trace:
+> `at new AppError (src/utils/AppError.ts:13:5)`
+
+As a developer debugging your app, you already know `AppError` was instantiated—**you don't care about the internal line inside `AppError.ts`**! 
+What you actually care about is **where in your business logic the error was triggered** (e.g., inside `validation.ts` or `auth.ts`).
+
+### 3. What `Error.captureStackTrace(this, this.constructor)` does:
+It tells Node's V8 engine:
+> *"When generating the stack trace for `this` error instance, **omit the `AppError` constructor itself** from the trace. Start the trace from where `new AppError(...)` was actually called."*
+
+#### Result:
+The internal `AppError` line is cleanly stripped out:
+```text
+Error: All Fields are required
+    at validateSignUpData (src/utils/validation.ts:14:11)  <-- Clean! Starts right where it happened!
+    at authRouter.post (src/routes/auth.ts:17:3)
+```
+It keeps terminal and production logs clean, concise, and focused on the real source of the bug.
+
