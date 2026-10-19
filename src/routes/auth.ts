@@ -12,18 +12,13 @@ import express from "express";
 import bcrypt from "bcrypt";
 import User from "../models/user";
 import { validateSignUpData } from "../utils/validation";
-import { userAuth } from "../middlewares/auth";
+import { guestOnly, userAuth } from "../middlewares/auth";
 import AppError from "../utils/AppError";
+import { cookieOptions } from "../config/cookie";
 
 const authRouter = express.Router();
 
-const cookieOptions: CookieOptions = {
-  httpOnly: true, //"Browser JavaScript cannot touch or steal this cookie.(Protects from XSS)"
-  sameSite: "lax", //"Only send this cookie if the user is actually on my website."
-  secure: process.env.NODE_ENV === "production", //"Only send this cookie over encrypted HTTPS connections."
-};
-
-authRouter.post("/sign-up", async (req, res) => {
+authRouter.post("/sign-up", guestOnly, async (req, res) => {
   validateSignUpData(req);
   const { firstName, lastName, emailId, password }: SignUpBodyType = req.body;
   const passwardHash = await bcrypt.hash(password, 10);
@@ -42,7 +37,7 @@ authRouter.post("/sign-up", async (req, res) => {
     .json({ status: "success", message: "User added successfully" });
 });
 
-authRouter.post("/login", async (req, res) => {
+authRouter.post("/login", guestOnly, async (req, res) => {
   const { emailId, password }: LoginBodyType = req.body;
 
   if (!emailId || !password) {
