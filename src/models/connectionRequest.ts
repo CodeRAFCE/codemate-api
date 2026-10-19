@@ -1,5 +1,16 @@
-import mongoose, { Connection } from "mongoose";
+import type { HydratedDocument, InferSchemaType, Model } from "mongoose";
+import mongoose from "mongoose";
 import AppError from "../utils/AppError";
+
+const CONNECTION_STATUSES = [
+  "ignore",
+  "interested",
+  "accepted",
+  "rejected",
+  "blocked",
+] as const;
+
+export type ConnectionStatusType = (typeof CONNECTION_STATUSES)[number];
 
 const requestSchema = new mongoose.Schema(
   {
@@ -17,7 +28,7 @@ const requestSchema = new mongoose.Schema(
       type: String,
       required: true,
       enum: {
-        values: ["ignore", "interested", "accepted", "rejected", "blocked"],
+        values: [...CONNECTION_STATUSES],
         message: `{VALUE} is incorrect status type`,
       },
     },
@@ -25,17 +36,22 @@ const requestSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+export type ConnectionRequestType = InferSchemaType<typeof requestSchema>;
+export type ConnectionRequestDocument = HydratedDocument<ConnectionRequestType>;
+
 // Add this right before creating the model
 requestSchema.index({ fromUserId: 1, toUserId: 1 }, { unique: true });
 
 requestSchema.pre("save", function () {
   const connectionRequest = this;
-
   if (connectionRequest.fromUserId.equals(connectionRequest.toUserId)) {
     throw new AppError("Cannot send connection request to yourself!", 400);
   }
 });
 
-const ConnectionRequest = mongoose.model("ConnectionRequest", requestSchema);
+const ConnectionRequest = mongoose.model<
+  ConnectionRequestType,
+  Model<ConnectionRequestType>
+>("ConnectionRequest", requestSchema);
 
 export default ConnectionRequest;

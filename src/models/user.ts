@@ -1,7 +1,16 @@
+import type { InferSchemaType, HydratedDocument, Model } from "mongoose";
 import mongoose from "mongoose";
 import validator from "validator";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+
+export interface IUserMethods {
+  getJWT(): Promise<string>;
+  validatePassword(passwordByUser: string): Promise<boolean>;
+}
+
+const GENDERS = ["male", "female", "others"] as const;
+export type GenderType = (typeof GENDERS)[number];
 
 const userSchema = new mongoose.Schema(
   {
@@ -19,7 +28,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      validate(value) {
+      validate(value: string) {
         if (!validator.isEmail(value))
           throw new Error("Invalid email address:" + value);
       },
@@ -27,7 +36,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      validate(value) {
+      validate(value: string) {
         if (!validator.isStrongPassword(value))
           throw new Error("Provide a strong password");
       },
@@ -36,7 +45,7 @@ const userSchema = new mongoose.Schema(
     gender: {
       type: String,
       enum: {
-        values: ["male", "female", "others"],
+        values: [...GENDERS],
         message: `{VALUE} is incorrect gender`,
       },
     },
@@ -44,7 +53,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       default:
         "https://d38we5ntdyxyje.cloudfront.net/858987/profile/GJQSELLC_avatar_medium_square.jpg",
-      validate(value) {
+      validate(value: string) {
         if (!validator.isURL(value))
           throw new Error("Invalid URL format:" + value);
       },
@@ -52,7 +61,7 @@ const userSchema = new mongoose.Schema(
     skills: {
       type: [String],
       validate: {
-        validator: (value) => value.length <= 10,
+        validator: (value: string[]) => value.length <= 10,
         message: "Too many items!",
       },
     },
@@ -61,6 +70,10 @@ const userSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+export type UserType = InferSchemaType<typeof userSchema>;
+export type UserDocument = HydratedDocument<UserType, IUserMethods>;
+export type UserModel = Model<UserType, {}, IUserMethods>;
+
 // Compond index in mongoDB
 // Find queries runs fast when using index
 //
@@ -68,8 +81,10 @@ userSchema.index({ firstName: 1, lastName: 1 });
 
 userSchema.methods.getJWT = async function (): Promise<string> {
   const user = this;
+  const secret = process.env.JWT_SECRET;
+  if (!secret) throw new Error("Secret Key is not configured");
 
-  const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+  const token = await jwt.sign({ _id: user._id }, secret, {
     expiresIn: "1d",
   });
 
@@ -84,6 +99,6 @@ userSchema.methods.validatePassword = async function (
   return isPasswordValid;
 };
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model<UserType, UserModel>("User", userSchema);
 
 export default User;
