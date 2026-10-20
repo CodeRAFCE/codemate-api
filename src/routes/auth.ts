@@ -36,7 +36,8 @@ authRouter.post("/sign-up", guestOnly, async (req, res) => {
 });
 
 authRouter.post("/login", guestOnly, async (req, res) => {
-  const { emailId, password }: LoginBodyType = req.body;
+  const body: LoginBodyType = req.body ?? {};
+  const { emailId, password } = body;
 
   if (!emailId || !password) {
     throw new AppError("Email and password are required", 400);

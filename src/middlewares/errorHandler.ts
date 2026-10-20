@@ -34,7 +34,7 @@ const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   }
 
   // Calculate status AFTER determining final statusCode
-  status = err.status || (`${statusCode}`.startsWith("4") ? "fail" : "error");
+  status = `${statusCode}`.startsWith("4") ? "fail" : "error";
 
   if (statusCode === 500) {
     console.error("💥 UNEXPECTED SERVER ERROR:", err);

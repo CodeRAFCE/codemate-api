@@ -3,7 +3,8 @@ import validator from "validator";
 import AppError from "./AppError";
 
 export const validateSignUpData = (req: Request): void => {
-  const { firstName, lastName, emailId, password } = req.body;
+  const body = req.body ?? {};
+  const { firstName, lastName, emailId, password } = body;
 
   const missing = [firstName, lastName, emailId, password].some(
     (v) => typeof v !== "string" || !v.trim(),
@@ -20,7 +21,8 @@ export const validateSignUpData = (req: Request): void => {
 };
 
 export const validateProfileEditData = (req: Request): boolean => {
-  const { about, skills, photoUrl } = req.body;
+  const body = req.body ?? {};
+  const { about, skills, photoUrl } = body;
 
   const allowedEditFields = [
     "firstName",
