@@ -5,12 +5,15 @@ import app from "../src/app";
 import {
   createUser,
   loginAgent,
+  reviewRequest,
   sendRequest,
   testUser,
   userB,
   userC,
 } from "./helpers";
-import ConnectionRequest from "../src/models/connectionRequest";
+import ConnectionRequest, {
+  ConnectionStatusType,
+} from "../src/models/connectionRequest";
 
 const randomId = () => new mongoose.Types.ObjectId().toString();
 
@@ -140,4 +143,135 @@ describe("POST /api/request/send/:status/:toUserId", () => {
   });
 });
 
-describe("PATCH /api/request/review/:status/:reqId", () => {});
+describe("PATCH /api/request/review/:status/:reqId", () => {
+  const seed = async (status: ConnectionStatusType = "interested") => {
+    const a = await createUser(testUser);
+    const b = await createUser(userB);
+    const c = await createUser(userC);
+    const connection = await ConnectionRequest.create({
+      fromUserId: a._id,
+      toUserId: b._id,
+      status,
+    });
+    return { a, b, c, connection };
+  };
+
+  const statusInDb = async (id: unknown) =>
+    (await ConnectionRequest.findById(id))!.status;
+
+  it.each(["accepted", "rejected"])(
+    "lets the receiver set the status to '%s'",
+    async (status) => {
+      const { connection } = await seed();
+      const agentB = await loginAgent(userB);
+
+      const res = await reviewRequest(agentB, status, connection.id);
+
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBe(`Connection request ${status}`);
+      expect(res.body.data.status).toBe(status);
+      expect(await statusInDb(connection._id)).toBe(status);
+    },
+  );
+
+  it.each(["interested", "ignore", "blocked", "banana"])(
+    "rejects '%s' as a review status",
+    async (status) => {
+      const { connection } = await seed();
+      const agentB = await loginAgent(userB);
+
+      const res = await reviewRequest(agentB, status, connection.id);
+
+      expect(res.status).toBe(400);
+      expect(await statusInDb(connection._id)).toBe("interested");
+    },
+  );
+
+  it("returns 400 for a malformed request id", async () => {
+    await seed();
+    const agentB = await loginAgent(userB);
+    const res = await reviewRequest(agentB, "review", "123");
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 404 for a request id that does not exist", async () => {
+    await seed();
+    const agentB = await loginAgent(userB);
+    const res = await reviewRequest(agentB, "accepted", randomId());
+    expect(res.status).toBe(404);
+  });
+
+  it("does not let the sender accept their own request", async () => {
+    const { connection } = await seed();
+    const agentA = await loginAgent(testUser);
+
+    const res = await reviewRequest(agentA, "accepted", connection.id);
+
+    expect(res.status).toBe(404);
+    expect(await statusInDb(connection._id)).toBe("interested");
+  });
+
+  it("does not let an unrelated user review someone else's request", async () => {
+    const { connection } = await seed();
+    const agentC = await loginAgent(userC);
+
+    const res = await reviewRequest(agentC, "accepted", connection.id);
+
+    expect(res.status).toBe(404);
+    expect(await statusInDb(connection._id)).toBe("interested");
+  });
+
+  it.each(["ignore", "accepted", "rejected"] as const)(
+    "cannot review a request that is already '%s'",
+    async (current) => {
+      const { connection } = await seed(current);
+      const agentB = await loginAgent(userB);
+
+      const res = await reviewRequest(agentB, "accepted", connection.id);
+
+      expect(res.status).toBe(404);
+      expect(await statusInDb(connection._id)).toBe(current);
+    },
+  );
+});
+
+describe("ConnectionRequest model", () => {
+  it("refuses a request from a user to themselves (pre-save hook)", async () => {
+    const a = await createUser(testUser);
+    await expect(
+      ConnectionRequest.create({
+        fromUserId: a._id,
+        toUserId: a._id,
+        status: "interested",
+      }),
+    ).rejects.toMatchObject({ statusCode: 400 });
+  });
+
+  it("enforces one document per (from, to) pair with the unique index", async () => {
+    const a = await createUser(testUser);
+    const b = await createUser(userB);
+    const data = {
+      fromUserId: a._id,
+      toUserId: b._id,
+      status: "interested",
+    } as const;
+
+    await ConnectionRequest.create(data);
+    await expect(ConnectionRequest.create(data)).rejects.toMatchObject({
+      code: 11000,
+    });
+  });
+
+  it("rejects a status outside the enum", async () => {
+    const a = await createUser(testUser);
+    const b = await createUser(userB);
+    await expect(
+      ConnectionRequest.create({
+        fromUserId: a._id,
+        toUserId: b._id,
+        // @ts-expect-error
+        status: "banana",
+      }),
+    ).rejects.toMatchObject({ name: "ValidationError" });
+  });
+});

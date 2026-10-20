@@ -76,6 +76,8 @@ requestRouter.patch("/review/:status/:reqId", userAuth, async (req, res) => {
   if (!loggedInUser) throw new AppError("Unauthorized Access", 401);
 
   const { status, reqId } = req.params ?? {};
+  if (!status && !reqId)
+    throw new AppError("Please provide status and ID", 400);
 
   const allowedStatus: ReviewStatus[] = ["accepted", "rejected"];
   if (!allowedStatus.includes(status as ReviewStatus))
