@@ -13,19 +13,22 @@ type ReviewStatus = (typeof REVIEW_STATUSES)[number]; // "accepted" | "rejected"
 const requestRouter = express.Router();
 
 requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
-  const { status, toUserId } = req.params;
+  const { status, toUserId } = req.params ?? {};
 
-  if (!req.user) throw new AppError("Unauthorized Access", 401);
-  if (!toUserId) throw new AppError("Invalid User ID", 400);
-
-  const fromUserId = req.user._id;
-
-  const toUser = await User.findById(toUserId);
-  if (!toUser) throw new AppError("User not found", 404);
+  if (!status && !toUserId)
+    throw new AppError("Please provide status and ID", 400);
 
   const allowedStatus: SendStatus[] = ["interested", "ignore"];
   if (!allowedStatus.includes(status as SendStatus))
     throw new AppError("Invalid Status", 400);
+
+  if (!req.user) throw new AppError("Unauthorized Access", 401);
+  if (!toUserId) throw new AppError("Invalid User ID", 400);
+
+  const fromUserId = req.user!._id;
+
+  const toUser = await User.findById(toUserId);
+  if (!toUser) throw new AppError("User not found", 404);
 
   if (fromUserId.equals(toUserId as string))
     throw new AppError("Cannot send request to yourself", 400);
@@ -72,7 +75,7 @@ requestRouter.patch("/review/:status/:reqId", userAuth, async (req, res) => {
   const loggedInUser = req.user;
   if (!loggedInUser) throw new AppError("Unauthorized Access", 401);
 
-  const { status, reqId } = req.params;
+  const { status, reqId } = req.params ?? {};
 
   const allowedStatus: ReviewStatus[] = ["accepted", "rejected"];
   if (!allowedStatus.includes(status as ReviewStatus))

@@ -21,8 +21,8 @@
   "scripts": {
     "test": "vitest run",
     "tes:watch": "vitest",
-    "dev": "tsx watch ./src/app.ts",
-    "build": "tsdown --minify --clean src/app.ts"
+    "dev": "tsx watch ./src/server.ts",
+    "build": "tsdown --minify --clean src/server.ts"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

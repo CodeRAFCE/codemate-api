@@ -4,7 +4,6 @@ import { describe, it, expect } from "vitest";
 import app from "../src/app";
 import User from "../src/models/user";
 import { testUser, login, loginAgent, signUp } from "./helpers";
-import test from "node:test";
 
 /**
  * * Test if User is created

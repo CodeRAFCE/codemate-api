@@ -40,6 +40,7 @@ export type ConnectionRequestType = InferSchemaType<typeof requestSchema>;
 export type ConnectionRequestDocument = HydratedDocument<ConnectionRequestType>;
 
 // Add this right before creating the model
+// makes sure it is always unique in the DB
 requestSchema.index({ fromUserId: 1, toUserId: 1 }, { unique: true });
 
 requestSchema.pre("save", function () {
