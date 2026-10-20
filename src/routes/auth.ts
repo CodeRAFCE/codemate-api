@@ -1,12 +1,4 @@
-import type { CookieOptions } from "express";
 import type { UserType } from "../models/user";
-
-type SignUpBodyType = Pick<
-  UserType,
-  "firstName" | "lastName" | "emailId" | "password"
->;
-
-type LoginBodyType = Pick<UserType, "emailId" | "password">;
 
 import express from "express";
 import bcrypt from "bcrypt";
@@ -15,6 +7,12 @@ import { validateSignUpData } from "../utils/validation";
 import { guestOnly, userAuth } from "../middlewares/auth";
 import AppError from "../utils/AppError";
 import { cookieOptions } from "../config/cookie";
+
+type SignUpBodyType = Pick<
+  UserType,
+  "firstName" | "lastName" | "emailId" | "password"
+>;
+type LoginBodyType = Pick<UserType, "emailId" | "password">;
 
 const authRouter = express.Router();
 
