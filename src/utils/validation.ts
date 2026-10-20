@@ -24,6 +24,9 @@ export const validateProfileEditData = (req: Request): boolean => {
   const body = req.body ?? {};
   const { about, skills, photoUrl } = body;
 
+  const keys = Object.keys(body);
+  if (keys.length === 0) throw new AppError("No fields to update", 400);
+
   const allowedEditFields = [
     "firstName",
     "lastName",

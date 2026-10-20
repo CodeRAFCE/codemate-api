@@ -33,7 +33,7 @@ profileRouter.patch("/edit", userAuth, async (req, res) => {
   // Object.assign(loggedInUser, req.body);
   // OR
   // * use in-built mongoose method to do the same
-  Object.keys(req.body).forEach((key) => {
+  Object.keys(req.body ?? {}).forEach((key) => {
     loggedInUser.set(key, req.body[key]);
   });
   await loggedInUser.save();
@@ -45,7 +45,8 @@ profileRouter.patch("/edit", userAuth, async (req, res) => {
 });
 
 profileRouter.patch("/password", userAuth, async (req, res) => {
-  const { newPassword } = req.body;
+  const body = req.body ?? {};
+  const { newPassword } = body;
   if (!newPassword || !validator.isStrongPassword(newPassword))
     throw new AppError("Provide a strong password", 400);
 
