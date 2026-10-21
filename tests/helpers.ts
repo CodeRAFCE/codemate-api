@@ -23,6 +23,13 @@ export const userC = {
   password: "Str0ng@Pass!",
 };
 
+export const userD = {
+  firstName: "Meera",
+  lastName: "Iyer",
+  emailId: "meera@example.com",
+  password: "Str0ng@Pass!",
+};
+
 export const signUp = (overrides = {}) =>
   request(app)
     .post("/api/auth/sign-up")
@@ -36,12 +43,6 @@ export const login = (overrides = {}) =>
       password: testUser.password,
       ...overrides,
     });
-
-// Sign up through the API and return the saved document
-export const createUser = async (user = testUser) => {
-  await signUp(user);
-  return (await User.findOne({ emailId: user.emailId }))!;
-};
 
 export const loginAgent = async (user = testUser) => {
   await signUp();
@@ -62,3 +63,18 @@ export const sendRequest = (agent: Agent, status: string, toUserId: string) =>
 
 export const reviewRequest = (agent: Agent, status: string, reqId: string) =>
   agent.patch(`/api/request/review/${status}/${reqId}`);
+
+// Sign up through the API and return the saved document
+export const createUser = async (user = testUser) => {
+  await signUp(user);
+  return (await User.findOne({ emailId: user.emailId }))!;
+};
+
+export const createUsers = (count: number) =>
+  User.insertMany(
+    Array.from({ length: count }, (_, i) => ({
+      firstName: `Person${i}`,
+      emailId: `person${i}@example.com`,
+      password: testUser.password,
+    })),
+  );

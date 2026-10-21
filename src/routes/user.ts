@@ -44,14 +44,16 @@ userRouter.get("/connections", userAuth, async (req, res) => {
     .populate("fromUserId", USER_SAFE_DATA)
     .populate("toUserId", USER_SAFE_DATA);
 
-  const data = connectionRequest.map((row) => {
-    // To compare both ObjectID use toString()
-    if (row.fromUserId._id.toString() === loggedInUserId) {
-      return row.toUserId;
-    }
+  const data = connectionRequest
+    .map((row) => {
+      // To compare both ObjectID use toString()
+      if (row.fromUserId._id.toString() === loggedInUserId) {
+        return row.toUserId;
+      }
 
-    return row.fromUserId;
-  });
+      return row.fromUserId;
+    })
+    .filter(Boolean);
 
   res.json({ status: "success", message: "Data fetched successfully", data });
 });
@@ -116,7 +118,7 @@ userRouter.get("/feed", userAuth, async (req, res) => {
     .skip(skipRecords)
     .limit(limit);
 
-  res.json({ status: "success", message: "Data fetched", users });
+  res.json({ status: "success", message: "Data fetched", data: users });
 });
 
 export default userRouter;
