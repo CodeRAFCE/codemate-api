@@ -15,3 +15,5 @@ describe("test setup", () => {
     expect(await User.countDocuments()).toBe(0);
   });
 });
+
+//Ignore this file

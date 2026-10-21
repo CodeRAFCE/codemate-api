@@ -20,10 +20,11 @@
   "main": "index.js",
   "scripts": {
     "test": "vitest run",
-    "tes:watch": "vitest",
+    "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "dev": "tsx watch ./src/server.ts",
-    "build": "tsdown --minify --clean src/server.ts"
+    "build": "tsdown --minify --clean src/server.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

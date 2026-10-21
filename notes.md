@@ -452,3 +452,21 @@ It keeps terminal and production logs clean, concise, and focused on the real so
 - `vitest` - the test runned it file .test.ts files and runs them.
 - `supertest @types/supertest` - Mock http requests directly to your express app and type definitions for TS support
 - `mongodb-memory-server` Downloads a real MongoDB binary and runs a temporary DB in memory
+
+---
+
+# CI/CD
+
+You push code → a robot runs npm test on a clean computer → green tick or red cross
+
+`CI` = Continuous Integration. Every time code is pushed, the robot installs your project from scratch and runs your checks (like npm test). It reports pass or fail.
+`CD` = Continuous Deployment. If the checks pass, the robot also puts your code on a server so real people can use it. We'll come to this much later.
+
+# .yml file
+
+`Workflow` One whole instruction file
+`Trigger` What starts it (for example, "someone pushed code")
+
+A job is the whole piece of work, and the steps are the individual tasks inside it, run in order. If any step fails, the job stops and shows a red cross.
+
+One detail worth adding: each job gets its own fresh computer, and all the steps inside that job share that one computer. That's why "install packages" can come before "run tests" and the tests can still use what was installed.
