@@ -7,6 +7,8 @@ import {
   userD,
   createUser,
   loginAgent,
+  sendRequest,
+  reviewRequest,
 } from "./helpers";
 
 type Agent = Awaited<ReturnType<typeof loginAgent>>;
@@ -91,5 +93,57 @@ describe("full connection flow: feed -> request -> review -> connections", () =>
     );
     expect(replay.status).toBe(404);
     expect(await connections(agentA)).toEqual([b.id, c.id].sort());
+  });
+});
+
+describe("other flows", () => {
+  it("'ignore' is silent: no notification, hidden both ways, and B can't reach back", async () => {
+    const a = await createUser(testUser);
+    const b = await createUser(userB);
+    const agentA = await loginAgent(testUser);
+    const agentB = await loginAgent(userB);
+
+    await sendRequest(agentA, "ignore", b.id);
+
+    expect(await received(agentB)).toEqual([]);
+    expect(await feed(agentA)).toEqual([]);
+    expect(await feed(agentB)).toEqual([]);
+    expect(await connections(agentA)).toEqual([]);
+    expect((await sendRequest(agentB, "interested", a.id)).status).toBe(409);
+  });
+
+  it("a stranger cannot accept someone else's request", async () => {
+    const a = await createUser(testUser);
+    const b = await createUser(userB);
+    await createUser(userC);
+    const agentA = await loginAgent(testUser);
+    const agentB = await loginAgent(userB);
+    const agentC = await loginAgent(userC);
+
+    await sendRequest(agentA, "interested", b.id);
+    const [pending] = await received(agentB);
+
+    const res = await reviewRequest(agentC, "accepted", pending._id);
+
+    expect(res.status).toBe(404);
+    expect(await received(agentB)).toHaveLength(1); // still pending
+    expect(await connections(agentA)).toEqual([]);
+    expect(await connections(agentC)).toEqual([]);
+    void a;
+  });
+
+  it("connected users can't send requests to each other again", async () => {
+    const a = await createUser(testUser);
+    const b = await createUser(userB);
+    const agentA = await loginAgent(testUser);
+    const agentB = await loginAgent(userB);
+
+    await sendRequest(agentA, "interested", b.id);
+    const [pending] = await received(agentB);
+    await reviewRequest(agentB, "accepted", pending._id);
+
+    expect((await sendRequest(agentA, "interested", b.id)).status).toBe(409);
+    expect((await sendRequest(agentB, "interested", a.id)).status).toBe(409);
+    expect(await connections(agentA)).toEqual([b.id]);
   });
 });
