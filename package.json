@@ -19,12 +19,13 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
+    "start": "node dist/server.mjs",
     "dev": "tsx watch ./src/server.ts",
     "build": "tsdown --minify --clean src/server.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
