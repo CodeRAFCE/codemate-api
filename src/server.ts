@@ -6,6 +6,7 @@ import { connectDB } from "./config/database";
 
 const PORT = 3000;
 
+// Alway connect to DB first before listening to any PORT
 connectDB()
   .then(() => {
     console.log("Database connection established");
