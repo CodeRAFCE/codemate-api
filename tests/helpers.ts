@@ -45,7 +45,7 @@ export const login = (overrides = {}) =>
     });
 
 export const loginAgent = async (user = testUser) => {
-  await signUp();
+  await signUp(user);
   const agent = request.agent(app);
 
   await agent.post("/api/auth/login").send({

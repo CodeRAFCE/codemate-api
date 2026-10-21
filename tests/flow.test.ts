@@ -12,7 +12,7 @@ import {
 } from "./helpers";
 
 type Agent = Awaited<ReturnType<typeof loginAgent>>;
-const ids = (list: { _id: string }[]) => list?.map((u) => u?._id).sort();
+const ids = (list: { _id: string }[]) => list.map((u) => u._id).sort();
 
 const feed = async (agent: Agent) =>
   ids((await agent.get("/api/user/feed")).body.data);
