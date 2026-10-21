@@ -44,16 +44,14 @@ userRouter.get("/connections", userAuth, async (req, res) => {
     .populate("fromUserId", USER_SAFE_DATA)
     .populate("toUserId", USER_SAFE_DATA);
 
-  const data = connectionRequest
-    .map((row) => {
-      // To compare both ObjectID use toString()
-      if (row.fromUserId._id.toString() === loggedInUserId) {
-        return row.toUserId;
-      }
+  const data = connectionRequest.map((row) => {
+    // To compare both ObjectID use toString()
+    if (row.fromUserId._id.toString() === loggedInUserId) {
+      return row.toUserId;
+    }
 
-      return row.fromUserId;
-    })
-    .filter(Boolean);
+    return row.fromUserId;
+  });
 
   res.json({ status: "success", message: "Data fetched successfully", data });
 });
