@@ -1,11 +1,11 @@
-# DevTinder API
+# CodeMate API
 
-[![CI](https://github.com/CodeRAFCE/devtinder-api/actions/workflows/ci.yml/badge.svg)]
-(https://github.com/CodeRAFCE/devtinder-api/actions/workflows/ci.yml)
+[![CI](https://github.com/CodeRAFCE/codemate-api/actions/workflows/ci.yml/badge.svg)]
+(https://github.com/CodeRAFCE/codemate-api/actions/workflows/ci.yml)
 
 A REST API for a developer-matching app. Developers sign up, browse a feed of other developers, send connection requests, and accept or reject the ones they receive.
 
-**Live API:** https://devtinder-api-wyxa.onrender.com
+**Live API:** https://codemate-api-wyxa.onrender.com
 **Note:** hosted on Render's free tier, the first request after a period of inactivity can take a while while the instance wakes up.
 
 ---
@@ -97,8 +97,8 @@ Errors return JSON with the matching HTTP status code:
 ### Setup
 
 ```bash
-git clone https://github.com/CodeRAFCE/devtinder-api.git
-cd devtinder-api
+git clone https://github.com/CodeRAFCE/codemate-api.git
+cd codemate-api
 npm install
 cp .env.example .env   # then fill in the values
 npm run dev

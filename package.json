@@ -1,18 +1,18 @@
 {
-  "name": "devtinder-api",
+  "name": "codemate-api",
   "version": "1.0.0",
   "description": "tinder for dev",
   "keywords": [
     "nodejs",
     "javascript"
   ],
-  "homepage": "https://github.com/CodeRAFCE/devtinder-api#readme",
+  "homepage": "https://github.com/CodeRAFCE/codemate-api#readme",
   "bugs": {
-    "url": "https://github.com/CodeRAFCE/devtinder-api/issues"
+    "url": "https://github.com/CodeRAFCE/codemate-api/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CodeRAFCE/devtinder-api.git"
+    "url": "git+https://github.com/CodeRAFCE/codemate-api.git"
   },
   "license": "ISC",
   "author": "Seshan A",
