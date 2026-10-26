@@ -3,6 +3,7 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     environment: "node",
+    // fileParallelism: false, // run test files one after another, not in parallel
     include: ["tests/**/*.test.ts"],
     setupFiles: ["./tests/setup.ts"],
     env: { JWT_SECRET: "test-secret" },

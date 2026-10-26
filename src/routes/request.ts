@@ -101,20 +101,47 @@ requestRouter.patch("/review/:status/:reqId", userAuth, async (req, res) => {
   if (!allowedStatus.includes(status as ReviewStatus))
     throw new AppError("Invalid Status", 400);
 
-  const request = await ConnectionRequest.findOne({
-    _id: reqId,
-    toUserId: loggedInUser._id,
-    status: "interested",
-  });
+  const request = await ConnectionRequest.findOneAndUpdate(
+    {
+      _id: reqId,
+      toUserId: loggedInUser._id,
+      status: "interested",
+    },
+    { status },
+    { new: true },
+  );
 
   if (!request) throw new AppError("Connection request does not exist", 404);
-
-  request.status = status as ReviewStatus;
-  await request.save();
 
   res.json({
     status: "success",
     message: `Connection request ${status}`,
+    data: request,
+  });
+});
+
+requestRouter.patch("/withdraw/:reqId", userAuth, async (req, res) => {
+  const loggedInUser = req.user;
+  if (!loggedInUser) throw new AppError("SESSION Invalid or Expired", 401);
+
+  const { reqId } = req.params ?? {};
+  if (!reqId) throw new AppError("Please provide ID", 400);
+
+  const request = await ConnectionRequest.findOneAndUpdate(
+    {
+      _id: reqId,
+      fromUserId: loggedInUser._id,
+      status: "interested",
+    },
+    { status: "withdrawn" },
+    { new: true }, // return the document AFTER the update (default is before)
+  );
+
+  if (!request) throw new AppError("Connection request does not exist", 404);
+
+  res.json({
+    status: "success",
+    message: `Connection request withdrawn`,
     data: request,
   });
 });

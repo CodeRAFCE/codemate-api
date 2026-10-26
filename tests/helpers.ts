@@ -64,6 +64,9 @@ export const sendRequest = (agent: Agent, status: string, toUserId: string) =>
 export const reviewRequest = (agent: Agent, status: string, reqId: string) =>
   agent.patch(`/api/request/review/${status}/${reqId}`);
 
+export const withdrawRequest = (agent: Agent, reqId: string) =>
+  agent.patch(`/api/request/withdraw/${reqId}`);
+
 // Sign up through the API and return the saved document
 export const createUser = async (user = testUser) => {
   await signUp(user);

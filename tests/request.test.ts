@@ -10,6 +10,7 @@ import {
   testUser,
   userB,
   userC,
+  withdrawRequest,
 } from "./helpers";
 import ConnectionRequest, {
   ConnectionStatusType,
@@ -233,6 +234,60 @@ describe("PATCH /api/request/review/:status/:reqId", () => {
       expect(await statusInDb(connection._id)).toBe(current);
     },
   );
+});
+
+describe("PATCH /api/request/withdraw/:reqId", () => {
+  const seed = async (status: ConnectionStatusType = "interested") => {
+    const a = await createUser(testUser);
+    const b = await createUser(userB);
+    const c = await createUser(userC);
+    const connection = await ConnectionRequest.create({
+      fromUserId: a._id,
+      toUserId: b._id,
+      status,
+    });
+    return { a, b, c, connection };
+  };
+
+  const statusInDb = async (id: unknown) =>
+    (await ConnectionRequest.findById(id))!.status;
+
+  it("should withdraw only interested request", async () => {
+    const { connection } = await seed();
+    const agent = await loginAgent();
+
+    const res = await withdrawRequest(agent, connection.id);
+
+    expect(res.status).toBe(200);
+    expect(await statusInDb(connection._id)).toBe("withdrawn");
+  });
+
+  it("User B should not withdraw User A request", async () => {
+    const { connection } = await seed();
+    const agentB = await loginAgent(userB);
+
+    const res = await withdrawRequest(agentB, connection.id);
+    expect(res.status).toBe(404);
+    expect(await statusInDb(connection._id)).toBe("interested");
+  });
+
+  it("Should not update to withdraw by a User C", async () => {
+    const { connection } = await seed();
+    const agentC = await loginAgent(userC);
+
+    const res = await withdrawRequest(agentC, connection.id);
+    expect(res.status).toBe(404);
+    expect(await statusInDb(connection._id)).toBe("interested");
+  });
+
+  it("Cannot withdraw accpected requests", async () => {
+    const { connection } = await seed("accepted");
+    const agent = await loginAgent();
+
+    const res = await withdrawRequest(agent, connection.id);
+    expect(res.status).toBe(404);
+    expect(await statusInDb(connection._id)).toBe("accepted");
+  });
 });
 
 describe("ConnectionRequest model", () => {
