@@ -63,19 +63,7 @@ userRouter.get("/feed", userAuth, async (req, res) => {
   const loggedInUser = req.user;
   if (!loggedInUser) throw new AppError("Unauthorized Access", 401);
 
-  // OPTIONAL CHECK
-  // if (
-  //   typeof parseInt(req.query.page) !== "number" &&
-  //   typeof parseInt(req.query.limit) !== "number"
-  // ) {
-  //   return res.status(400).json({ message: "Invalid page and limit values" });
-  // }
-
-  // const page = parseInt(req.query.page) || 1;
-  // const limit = parseInt(req.query.limit) || 10;
-  // This doesn't block the user from fetching the users but also always restricts to 30 users no matter what
-  // limit = limit > 30 ? 30 : limit;
-
+  // Making sure it's a string
   const pageStr = typeof req.query.page === "string" ? req.query.page : "1";
   const limitStr = typeof req.query.limit === "string" ? req.query.limit : "10";
 
@@ -83,16 +71,10 @@ userRouter.get("/feed", userAuth, async (req, res) => {
   const page = Math.max(1, parseInt(pageStr, 10) || 1);
   const limit = Math.min(30, Math.max(1, parseInt(limitStr, 10) || 10));
 
-  // Bad way because the user is blocked from seeing the users completely
-  // Instead always restrict the limit to 30 instead of showing error
-  // Bad UX for the application when using if statemate for avoiding users to fetch 100000
-  // if (limit > 30) {
-  //   return res.status(400).json({ message: "Pagination limit exceeded" });
-  // }
-
   const skipRecords = (page - 1) * limit;
 
   const connectionRequest = await ConnectionRequest.find({
+    status: { $ne: "withdrawn" },
     $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
   }).select("fromUserId toUserId");
 

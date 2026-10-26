@@ -111,7 +111,7 @@ describe("PATCH /api/profile/edit", () => {
   it.each([
     ["age under 18", { age: 17 }],
     ["an unknown gender", { gender: "robot" }],
-    ["a firstName shorter than 4 characters", { firstName: "Al" }],
+    ["a firstName shorter than 4 characters", { firstName: "A" }],
     ["an about text shorter than 10 characters", { about: "short" }],
   ])("rejects %s via schema validation", async (_label, body) => {
     const agent = await loginAgent();

@@ -33,6 +33,11 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
   if (fromUserId.equals(toUserId as string))
     throw new AppError("Cannot send request to yourself", 400);
 
+  const message =
+    status === "interested"
+      ? `${req.user.firstName} is interested in ${toUser.firstName}`
+      : `${req.user.firstName} ignored ${toUser.firstName}`;
+
   // Check if there is an existing ConnectionRequest from A -> B or B -> A
   const existingConnectionRequest = await ConnectionRequest.findOne({
     // 1) Check for fromUserId & toUserId for duplicate request
@@ -43,8 +48,24 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     ],
   });
 
-  if (existingConnectionRequest)
-    throw new AppError("Connection request already exists", 409); // Conflict Connection => 409
+  const connectionStatus = existingConnectionRequest?.status;
+
+  if (existingConnectionRequest) {
+    if (connectionStatus !== "withdrawn")
+      throw new AppError("Connection request already exists", 409); // Conflict Connection => 409
+
+    // Withdrawn → reuse the same document instead of creating a new one
+    existingConnectionRequest.fromUserId = fromUserId;
+    existingConnectionRequest.toUserId = toUser._id;
+    existingConnectionRequest.status = status as SendStatus;
+    await existingConnectionRequest.save();
+
+    return res.json({
+      status: "success",
+      message,
+      data: existingConnectionRequest,
+    });
+  }
 
   const connectionRequest = new ConnectionRequest({
     fromUserId,
@@ -54,16 +75,13 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
 
   await connectionRequest.save();
 
-  const message =
-    status === "interested"
-      ? `${req.user.firstName} is interested in ${toUser.firstName}`
-      : `${req.user.firstName} ignored ${toUser.firstName}`;
-
   res.json({
     status: "success",
     message,
     data: connectionRequest,
   });
+
+  return;
 });
 
 requestRouter.patch("/review/:status/:reqId", userAuth, async (req, res) => {

@@ -7,6 +7,7 @@ const CONNECTION_STATUSES = [
   "interested",
   "accepted",
   "rejected",
+  "withdrawn",
   "blocked",
 ] as const;
 
